@@ -1,26 +1,52 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import { getAllUsers } from './actions/users.actions'
+import TodoInput from './TodoInput'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+
+  componentDidMount() {
+    this.props.getAllUsers()
+  }
+
+  handleSubmit = (event) => {
+    event.preventDefault()
+    this.props.addNewTodo(this.state.newTodo)
+  }
+
+  render() {
+    let todosList = this.props.todos
+      .map((todo, i) => {
+        return ( 
+          <li key={i}>{todo}</li> 
+        )
+      })
+    let usersList = this.props.users.map(user => 
+      <li key={user.id}>{user.name}</li>)
+    return (
+      <div className="App">
+        <TodoInput />
+        <h2>List of todos</h2>
+        <ul>{todosList}</ul>
+        <h2>List of users</h2>
+        <ul>{usersList}</ul>
+      </div>
+    );
+  }
 }
 
-export default App;
+function mapStateToProps(state) {
+  return {
+    users: state.users,
+    todos:state.todos
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    getAllUsers: bindActionCreators(getAllUsers, dispatch)
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
